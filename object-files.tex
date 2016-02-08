@@ -1,0 +1,112 @@
+
+\chapter{Object Files}
+
+%%\section{Sections}
+
+%%\subsection{Special Sections}
+
+%%\begin{table}[H]
+%%\Hrule
+%%  \caption{Special sections}
+%%  \begin{center}
+%%    \begin{tabular}[t]{l|l|l}
+%%      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Type}
+%%       & \multicolumn{1}{c}{Attributes} \\
+%%      \hline
+%%    \end{tabular}
+%%  \end{center}
+%%\Hrule
+%%\end{table}
+
+%%\begin{description}
+%% \item[.eh_frame]
+%%\end{description}
+
+%%\subsection{EH\_FRAME sections}
+%%\label{sec_eh_frame}
+
+\section{Symbol Table}
+
+\begin{table}[H]
+\Hrule
+  \caption{\xOS Specific Symbol Types}
+  \label{ifunc}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
+      \hline
+      \texttt{STT_GNU_IFUNC} & \texttt{10}
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\subsection{\texttt{STT_GNU_IFUNC} Symbol}
+
+This symbol type is the same as \texttt{STT_FUNC} except that it always
+points to a resolve function or piece of executable code which takes
+no arguments and returns a function pointer.  If an \texttt{STT_GNU_IFUNC}
+symbol is referred to by a relocation, then evaluation of that relocation
+is delayed until load-time.  The value used in the relocation is the
+function pointer returned by an invocation of the \texttt{STT_GNU_IFUNC}
+symbol.
+
+The purpose of the \texttt{STT_GNU_IFUNC} symbol type is to allow the
+run-time to select between multiple versions of the implementation of
+a specific function.  The selection made in general will take the
+currently available hardware into account and select the most
+appropriate version.
+
+\subsubsection{Implementation Considerations}
+
+The calling convention of the \texttt{STT_GNU_IFUNC} resolve
+function, which takes no arguments and returns a function pointer,
+should follow the processor-specific ABI. All rules for caller-saved
+and callee-saved registers apply.
+
+There are special considerations for GOT when PLT is required:
+
+\begin{itemize}
+\item All references to a \texttt{STT_GNU_IFUNC} symbol, including
+function call and function pointer, should go through the PLT slot,
+which jumps to the address stored in the GOT entry.  If the
+\texttt{STT_GNU_IFUNC} symbol is locally defined, a processor-specific
+\texttt{IRELATIVE} relocation should be applied to the GOT entry at load
+time.  Otherwise, dynamic linker will lookup the symbol at the first
+reference to the function and update the GOT entry.  This applies to all
+usages of \texttt{STT_GNU_IFUNC} symbols in shared library, dynamic
+executable and static executable.
+
+Instead of branching to an \texttt{STT_GNU_IFUNC} symbol directly, calling
+a function always branches to its PLT entry, which simply loads its GOTPLT
+entry and branches to it.  Its GOTPLT entry has the real function address.
+
+\item An \texttt{STT_GNU_IFUNC} symbol has an optional GOT entry for the
+function pointer value of the symbol.  To load an \texttt{STT_GNU_IFUNC}
+symbol function pointer value:
+
+  \begin{itemize}
+  \item Use its GOTPLT entry in a shared object if it is forced local or
+        not dynamic.
+  \item Use its GOTPLT entry in a non-shared object if pointer equality
+        isn't needed.
+  \item Use its GOTPLT entry in a position independent executable (PIE).
+  \item Use its GOTPLT entry if no normal GOT, other than GOTPLT, is used.
+  \item Otherwise use its GOT entry.  We only need to relocate its GOT
+        entry in a shared object.
+  \end{itemize}
+
+\item We need dynamic relocation for \texttt{STT_GNU_IFUNC} symbol only
+when there is a non-GOT reference in a shared object.
+
+\item When a shared library references a \texttt{STT_GNU_IFUNC} symbol
+defined in executable, the address of the resolved function may be used.
+But in non-shared executable, the address of its GOTPLT entry may be used.
+Pointer equality may not work correctly.  PIE should be used if pointer
+equality is required.
+\end{itemize}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "abi"
+%%% End:

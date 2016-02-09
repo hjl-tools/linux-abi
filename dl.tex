@@ -1,0 +1,30 @@
+%%% vim:ai:tw=72:
+\chapter{Program Loading and Dynamic Linking}
+
+\section{Program header}
+
+The following \xOS program header types are defined:
+
+\begin{table}[H]
+\Hrule
+  \caption{Program Header Types}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
+      \hline
+      \texttt{PT_GNU_EH_FRAME} & \texttt{0x6474e550} \\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[PT_GNU_EH_FRAME]
+      The segment contains the stack unwind tables.
+      See Section~\ref{sec_eh_frame} of this document.
+\end{description}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "abi"
+%%% End:

@@ -1,29 +1,199 @@
 
 \chapter{Object Files}
 
-%%\section{Sections}
+\section{Sections}
 
-%%\subsection{Special Sections}
+\subsection{Special Sections}
 
-%%\begin{table}[H]
-%%\Hrule
-%%  \caption{Special sections}
-%%  \begin{center}
-%%    \begin{tabular}[t]{l|l|l}
-%%      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Type}
-%%       & \multicolumn{1}{c}{Attributes} \\
-%%      \hline
-%%    \end{tabular}
-%%  \end{center}
-%%\Hrule
-%%\end{table}
+\begin{table}[H]
+\Hrule
+  \caption{Special sections}
+  \begin{center}
+    \begin{tabular}[t]{l|l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Type}
+       & \multicolumn{1}{c}{Attributes} \\
+      \hline
+      \texttt{.eh_frame} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC}
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
 
-%%\begin{description}
-%% \item[.eh_frame]
-%%\end{description}
+\begin{description}
+ \item[.eh_frame] This section holds the unwind function table.
+                      The contents are described in Section~\ref{sec_eh_frame}
+                      of this document.
+\end{description}
 
-%%\subsection{EH\_FRAME sections}
-%%\label{sec_eh_frame}
+\subsection{EH\_FRAME sections}
+\label{sec_eh_frame}
+
+The call frame information needed for unwinding the stack is output into
+one section named
+\code{.eh_frame}.  An \code{.eh_frame} section consists of one or more
+subsections. Each subsection contains a CIE (Common Information Entry)
+followed by varying number of FDEs (Frame Descriptor Entry). A FDE
+corresponds to an explicit or compiler generated function in a
+compilation unit, all FDEs can access the CIE that begins their
+subsection for data.  If the code for a function is not one contiguous
+block, there will be a separate FDE for each contiguous sub-piece.
+
+If an object file contains C++ template instantiations there shall be
+a separate CIE immediately preceding each FDE corresponding to an
+instantiation.
+
+Using the preferred encoding specified below, the \code{.eh_frame} section can
+be entirely resolved at link time and thus can become part of the
+text segment.
+
+\code{EH_PE} encoding below refers to the pointer encoding as specified in the
+enhanced LSB Chapter 7 for \code{Eh_Frame_Hdr}.
+
+\begin{table}[H]
+\Hrule
+\caption{Common Information Entry (CIE)}
+\label{format-cie}
+\begin{center}
+\begin{tabular}{p{7em}|l|p{17em}}
+  \multicolumn{1}{c}{Field}
+         & \multicolumn{1}{c}{Length (byte)}
+         & \multicolumn{1}{c}{Description} \\ \hline
+  Length & 4 & Length of the CIE (not including this 4-byte field) \\
+  CIE id & 4 & Value 0 for \code{.eh_frame} (used to distinguish CIEs and
+		  FDEs when scanning the section) \\
+  Version & 1 & Value One (1) \\
+  CIE Augmentation String & string & Null-terminated string with legal
+     values being "" or 'z' optionally followed by single occurrances of
+     'P', 'L', or 'R' in any order.  The presence of character(s) in the
+     string dictates the content of field 8, the Augmentation Section.  Each
+     character has one or two associated operands in the AS (see
+     table~\ref{format-cieaug} for which ones).  Operand order
+     depends on position in the string ('z' must be first). \\
+  Code Align Factor & uleb128 & To be multiplied with the
+    "Advance Location" instructions in the Call Frame Instructions \\
+  Data Align Factor & sleb128 & To be multiplied with all offsets
+                                in the Call Frame Instructions \\
+  Ret Address Reg & 1/uleb128 &  A "virtual" register representation
+                                 of the return address. In Dwarf V2,
+			         this is a byte, otherwise it is
+			         uleb128. It is a byte in gcc 3.3.x \\
+  Optional CIE Augmentation Section & varying & Present if Augmentation
+                     String in Augmentation Section field 4 is not 0.
+		     See table~\ref{format-cieaug} for the content. \\
+  Optional Call Frame Instructions & varying & \\
+\hline
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{table}[H]
+\Hrule
+\caption{CIE Augmentation Section Content}
+\label{format-cieaug}
+\begin{center}
+\begin{tabular}{l|p{6em}|l|p{16em}}
+  \multicolumn{1}{c}{Char}
+         & \multicolumn{1}{c}{Operands}
+         & \multicolumn{1}{c}{Length (byte)}
+         & \multicolumn{1}{c}{Description} \\ \hline
+  z & size & uleb128 & Length of the remainder of the
+                                        Augmentation Section \\
+  P & personality_enc & 1 & Encoding specifier - preferred
+                            value is a pc-relative, signed
+                            4-byte \\
+    & personality routine & (encoded) & Encoded pointer to personality
+                                        routine (actually to the PLT
+                                        entry for the personality
+                                        routine) \\
+  R & code_enc & 1 & Non-default encoding for the
+                     code-pointers (FDE members
+                     \code{initial_location} and \code{address_range}
+                     and the operand for \code{DW_CFA_set_loc})
+                     - preferred value is pc-relative,
+                     signed 4-byte \\
+  L & lsda_enc & 1 & FDE augmentation bodies may contain
+		     LSDA pointers. If so they are encoded
+		     as specified here -
+		     preferred value is pc-relative, signed 4-byte possibly
+		     indirect thru a GOT entry \\
+\hline
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{table}[H]
+\Hrule
+\caption{Frame Descriptor Entry (FDE)}
+\label{format-fde}
+\begin{center}
+\begin{tabular}{p{7em}|l|p{17em}}
+  \multicolumn{1}{c}{Field}
+         & \multicolumn{1}{c}{Length (byte)}
+         & \multicolumn{1}{c}{Description} \\ \hline
+  Length & 4 & Length of the FDE (not including this 4-byte field) \\
+  CIE pointer & 4 & Distance from this field to the
+		    nearest preceding CIE (the value is subtracted from the
+		    current address). This value can never be zero and thus can
+		    be used to distinguish CIE's and FDE's when scanning the
+		    \code{.eh_frame} section \\
+  Initial Location & var & Reference to the function code
+                           corresponding to this FDE.
+                           If 'R' is missing from the CIE
+                           Augmentation String, the field is an
+                           8-byte absolute pointer. Otherwise,
+                           the corresponding \code{EH_PE} encoding in the
+                           CIE Augmentation Section is used to
+                           interpret the reference \\
+  Address Range & var & Size of the function code corresponding
+                       to this FDE.
+                       If 'R' is missing from the CIE
+                       Augmentation String, the field is an
+                       8-byte unsigned number. Otherwise,
+                       the size is determined by the
+                       corresponding \code{EH_PE} encoding in the
+                       CIE Augmentation Section (the
+                       value is always absolute) \\
+  Optional FDE Augmentation Section & var & Present if CIE Augmentation
+                     String is non-empty.
+		     See table~\ref{format-fdeaug} for the content. \\
+  Optional Call Frame Instructions & var & \\
+\hline
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{table}[H]
+\Hrule
+\caption{FDE Augmentation Section Content}
+\label{format-fdeaug}
+\begin{center}
+\begin{tabular}{l|p{6em}|l|p{16em}}
+  \multicolumn{1}{c}{Char}
+         & \multicolumn{1}{c}{Operands}
+         & \multicolumn{1}{c}{Length (byte)}
+         & \multicolumn{1}{c}{Description} \\ \hline
+  z & length & uleb128 & Length of the remainder of the
+                                        Augmentation Section \\
+  L & LSDA & var & LSDA pointer, encoded in the
+                   format specified by the
+                   corresponding operand in the CIE's
+                   augmentation body. (only present if length > 0). \\
+\hline
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+The existence and size of the optional call frame instruction area must
+be computed
+based on the overall size and the offset reached while scanning the
+preceding fields of the CIE or FDE.
+
+The overall size of a \code{.eh_frame} section is given in the ELF section
+header.  The only way to determine the number of entries is to scan
+the section until the end, counting entries as they are encountered.
 
 \section{Symbol Table}
 

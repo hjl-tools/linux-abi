@@ -13,16 +13,41 @@
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Type}
        & \multicolumn{1}{c}{Attributes} \\
       \hline
-      \texttt{.eh_frame} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC}
+      \texttt{.eh_frame} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
+      \texttt{.sdata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
+      \texttt{.sbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
+      \texttt{.lrodata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
+      \texttt{.ldata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
+      \texttt{.lbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
+      \texttt{.data.rel.ro} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
+      \texttt{.data.rel.local.ro} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE}
     \end{tabular}
   \end{center}
 \Hrule
 \end{table}
 
 \begin{description}
- \item[.eh_frame] This section holds the unwind function table.
-                      The contents are described in Section~\ref{sec_eh_frame}
-                      of this document.
+ \item[.eh_frame] This section holds the unwind function table.  The
+   contents are described in Section~\ref{sec_eh_frame} of this document.
+ \item[.sdata] This section holds small initialized data that
+   contribute to the program's memory image.
+ \item[.sbss] This section holds small uninitialized data that
+   contribute to the program's memory image.  By definition, the system
+   initializes the data with zeros when the program begins to run.
+ \item[.lrodata] This section holds large read-only data that typically
+   contribute to a non-writable segment in the process image.
+ \item[.ldata] This section holds large initialized data that
+   contribute to the program's memory image.
+ \item[.lbss] This section holds large uninitialized data that
+   contribute to the program's memory image.  By definition, the system
+   initializes the data with zeros when the program begins to run.
+ \item[.data.rel.ro] This section holds read-only data that typically
+   contribute to a writable segment in the process image which becomes
+   non-writable after relocation is completed.
+ \item[.data.rel.local.ro] This section holds read-only data that
+   typically contribute to a writable segment in the process image
+   which becomes non-writable after relocation is completed.  All
+   relocations contained in this section must be to local objects.
 \end{description}
 
 \subsection{EH\_FRAME sections}

@@ -301,6 +301,12 @@ Pointer equality may not work correctly.  PIE should be used if pointer
 equality is required.
 \end{itemize}
 
+\subsection{\texttt{STB_WEAK} Symbol}
+
+When creating executable, if dynamic relocation is available at run-time,
+the link editor should generate dynamic relocations against unresolved
+weak symbols so that their values will be resolved at run-time.
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"

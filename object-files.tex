@@ -14,6 +14,7 @@
        & \multicolumn{1}{c}{Attributes} \\
       \hline
       \texttt{.eh_frame} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
+      \texttt{.eh_frame_hdr} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
       \texttt{.sdata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.sbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.lrodata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
@@ -29,6 +30,9 @@
 \begin{description}
  \item[.eh_frame] This section holds the unwind function table.  The
    contents are described in Section~\ref{sec_eh_frame} of this document.
+ \item[.eh_frame_hdr] This section holds information about
+   \code{.eh_frame} section. The contents are described in
+   Section~\ref{sec_eh_frame_hdr} of this document.
  \item[.sdata] This section holds small initialized data that
    contribute to the program's memory image.
  \item[.sbss] This section holds small uninitialized data that
@@ -50,7 +54,7 @@
    relocations contained in this section must be to local objects.
 \end{description}
 
-\subsection{EH\_FRAME sections}
+\subsection{EH\_FRAME section}
 \label{sec_eh_frame}
 
 The call frame information needed for unwinding the stack is output into
@@ -71,8 +75,9 @@ Using the preferred encoding specified below, the \code{.eh_frame} section can
 be entirely resolved at link time and thus can become part of the
 text segment.
 
-\code{EH_PE} encoding below refers to the pointer encoding as specified in the
-enhanced LSB Chapter 7 for \code{Eh_Frame_Hdr}.
+\code{EH_PE} encoding below refers to the pointer encoding as specified in
+Section \texttt{DWARF Exception Header Encoding} of Linux Standard Base
+Core Specification.
 
 \begin{table}[H]
 \Hrule
@@ -219,6 +224,52 @@ preceding fields of the CIE or FDE.
 The overall size of a \code{.eh_frame} section is given in the ELF section
 header.  The only way to determine the number of entries is to scan
 the section until the end, counting entries as they are encountered.
+
+\subsection{EH\_FRAME\_HDR section}
+\label{sec_eh_frame_hdr}
+
+\code{.eh_frame_hdr} section contains information about \code{.eh_frame}
+section for optimizing stack unwinding.
+
+\begin{table}[H]
+\Hrule
+ \caption{\code{.eh_frame_hdr} Section Format}
+ \label{format-eh_frame_hdr}
+ \begin{center}
+  \begin{tabular}[t]{l|l|l}
+   \multicolumn{1}{c}{Encoding}
+     & \multicolumn{1}{c}{Field}
+       & \multicolumn{1}{c}{Required} \\
+   \hline
+   \texttt{unsigned byte} & \texttt{version} & \texttt{Yes} \\
+   \texttt{unsigned byte} & \texttt{eh_frame_ptr_enc} & \texttt{Yes}\\
+   \texttt{unsigned byte} & \texttt{fde_count_enc} & \texttt{Yes} \\
+   \texttt{unsigned byte} & \texttt{table_enc} & \texttt{Yes} \\
+   \texttt{[encoded]} & \texttt{eh_frame_ptr} & \texttt{No} \\
+   \texttt{[encoded]} & \texttt{fde_count} & \texttt{No} \\
+    & \texttt{binary search table} & \texttt{No} \\
+  \end{tabular}
+ \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[version] Version of \code{.eh_frame_hdr} section format.  It
+   should be 1.
+ \item[eh_frame_ptr_enc] \code{EH_PE} encoding of pointer to start of
+   \code{.eh_frame} section.
+ \item[fde_count_enc] \code{EH_PE} encoding of total FDE count number.
+   \code{DW_EH_PE_omit} if there is no \code{binary search table}.
+ \item[table_enc] \code{EH_PE} encoding of \code{binary search table}.
+   \code{DW_EH_PE_omit} if there is no \code{binary search table}.
+ \item[eh_frame_ptr] Pointer to start of \code{.eh_frame} section.
+ \item[fde_count] Total number of FDEs in \code{.eh_frame}
+   section.
+ \item[binary search table] A binary search table containing
+   \code{fde_count} entries. Each entry consists of FDE initial location
+   and address.  The entries are sorted in the increasing order by FDE
+   initial location value.
+\end{description}
 
 \section{Symbol Table}
 

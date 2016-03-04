@@ -15,6 +15,7 @@
       \hline
       \texttt{.eh_frame} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
       \texttt{.eh_frame_hdr} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
+      \texttt{.note.gnu.build-id} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.sdata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.sbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.lrodata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
@@ -33,6 +34,8 @@
  \item[.eh_frame_hdr] This section holds information about
    \code{.eh_frame} section. The contents are described in
    Section~\ref{sec_eh_frame_hdr} of this document.
+ \item[.note.gnu.build-id] This section holds a build ID note.  The
+   contents are described in Section~\ref{sec_build_id} of this document.
  \item[.sdata] This section holds small initialized data that
    contribute to the program's memory image.
  \item[.sbss] This section holds small uninitialized data that
@@ -269,6 +272,47 @@ section for optimizing stack unwinding.
    \code{fde_count} entries. Each entry consists of FDE initial location
    and address.  The entries are sorted in the increasing order by FDE
    initial location value.
+\end{description}
+
+\subsection{\code{.note.gnu.build-id} section}
+\label{sec_build_id}
+
+\code{.note.gnu.build-id} section contains a build ID note which is
+unique among the set of meaningful contents for ELF files and identical
+when the output file would otherwise have been identical.  It can be
+merged with other \code{SHT_NOTE} sections.
+
+\begin{table}[H]
+\Hrule
+ \caption{The Build ID Note Format}
+ \label{format-build_id}
+ \begin{center}
+  \begin{tabular}[t]{l|l|l}
+   \multicolumn{1}{c}{Field}
+     & \multicolumn{1}{c}{Length}
+       & \multicolumn{1}{c}{Contents} \\
+   \hline
+   \texttt{n_namsz} & \texttt{4} & \texttt{4} \\
+   \texttt{n_descsz} & \texttt{4} & The note descriptor size \\
+   \texttt{n_type} & \texttt{4} & \texttt{NT_GNU_BUILD_ID} \\
+   \texttt{n_name} & \texttt{4} & \texttt{GNU} \\
+   \texttt{n_desc} & \texttt{n_descsz} & The build ID \\
+  \end{tabular}
+ \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[n_namsz] Size of the \code{n_name} field.  A 4-byte integer in the
+   format of the target processor.  It should be 4.
+ \item[n_descsz] Size of the \code{n_desc} field.  A 4-byte integer in the
+   format of the target processor.
+ \item[n_type] Type of the note descriptor.  A 4-byte integer in the format
+   of the target processor.  It should be \code{NT_GNU_BUILD_ID}.
+ \item[n_name] Owner of the build ID note.  A null-terminated character
+   string.  It should be \code{GNU}.
+ \item[n_desc] The note descriptor.  The first \code{n_descsz} bytes in
+   \code{n_desc} is the build ID.
 \end{description}
 
 \section{Symbol Table}

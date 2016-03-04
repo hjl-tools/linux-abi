@@ -24,6 +24,28 @@ The following \xOS program header types are defined:
       Section~\ref{sec_eh_frame_hdr} of this document.
 \end{description}
 
+\section{Note Section}
+
+The following note descriptor types are defined:
+
+\begin{table}[H]
+\Hrule
+  \caption{Note Descriptor Types}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
+      \hline
+      \texttt{NT_GNU_BUILD_ID} & \texttt{3} \\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[NT_GNU_BUILD_ID]
+   The build ID note.  See Section~\ref{sec_build_id} of this document.
+\end{description}
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "abi"

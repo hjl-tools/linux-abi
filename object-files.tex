@@ -15,6 +15,7 @@
       \hline
       \texttt{.eh_frame} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
       \texttt{.eh_frame_hdr} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
+      \texttt{.note.ABI-tag} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.note.gnu.build-id} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.sdata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.sbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
@@ -34,6 +35,8 @@
  \item[.eh_frame_hdr] This section holds information about
    \code{.eh_frame} section. The contents are described in
    Section~\ref{sec_eh_frame_hdr} of this document.
+ \item[.note.ABI-tag] This section holds an ABI  note.  The contents are
+   described in Section~\ref{sec_abi_tag} of this document.
  \item[.note.gnu.build-id] This section holds a build ID note.  The
    contents are described in Section~\ref{sec_build_id} of this document.
  \item[.sdata] This section holds small initialized data that
@@ -313,6 +316,48 @@ merged with other \code{SHT_NOTE} sections.
    string.  It should be \code{GNU}.
  \item[n_desc] The note descriptor.  The first \code{n_descsz} bytes in
    \code{n_desc} is the build ID.
+\end{description}
+
+\subsection{\code{.note.ABI-tag} section}
+\label{sec_abi_tag}
+
+\code{.note.ABI-tag} section contains an ABI note which is used to
+identify OS and version targeted.  It can be merged with other
+\code{SHT_NOTE} sections.
+
+\begin{table}[H]
+\Hrule
+ \caption{The ABI Tag Note Format}
+ \label{format-abi_tag}
+ \begin{center}
+  \begin{tabular}[t]{l|l|l}
+   \multicolumn{1}{c}{Field}
+     & \multicolumn{1}{c}{Length}
+       & \multicolumn{1}{c}{Contents} \\
+   \hline
+   \texttt{n_namsz} & \texttt{4} & \texttt{4} \\
+   \texttt{n_descsz} & \texttt{4} & \texttt{16} \\
+   \texttt{n_type} & \texttt{4} & \texttt{NT_GNU_ABI_TAG} \\
+   \texttt{n_name} & \texttt{4} & \texttt{GNU} \\
+   \texttt{n_desc} & \texttt{16} & The ABI tag\\
+  \end{tabular}
+ \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[n_namsz] Size of the \code{n_name} field.  A 4-byte integer in the
+   format of the target processor.  It should be 4.
+ \item[descsz] Size of the \code{n_desc} field.  It should be 16.
+ \item[n_type] Type of the note descriptor.  A 4-byte integer in the format
+   of the target processor.  It should be \code{NT_GNU_ABI_TAG}.
+ \item[n_name] Owner of the build ID note.  A null-terminated character
+   string.  It should be \code{GNU}.
+ \item[n_desc] The note descriptor. Four 4-byte integers in the format of
+   the target processor.  The first 4-byte integer should 0.  The second,
+   third, and fourth 4-byte integers contain the earliest compatible
+   kernel version.  For example, if the 3 integers are 2, 2, and 5, this
+   signifies a 2.2.5 kernel.
 \end{description}
 
 \section{Symbol Table}

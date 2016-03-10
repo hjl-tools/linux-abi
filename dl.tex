@@ -35,6 +35,7 @@ The following note descriptor types are defined:
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
       \hline
+      \texttt{NT_GNU_ABI_TAG} & \texttt{1} \\
       \texttt{NT_GNU_BUILD_ID} & \texttt{3} \\
     \end{tabular}
   \end{center}
@@ -42,6 +43,8 @@ The following note descriptor types are defined:
 \end{table}
 
 \begin{description}
+ \item[NT_GNU_ABI_TAG]
+   The ABI tag note.  See Section~\ref{sec_abi_tag} of this document.
  \item[NT_GNU_BUILD_ID]
    The build ID note.  See Section~\ref{sec_build_id} of this document.
 \end{description}

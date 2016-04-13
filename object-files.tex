@@ -408,6 +408,7 @@ The following program property types are defined:
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
       \hline
       \texttt{GNU_PROPERTY_STACK_SIZE} & \texttt{1} \\
+      \texttt{GNU_PROPERTY_NO_COPY_ON_PROTECTED} & \texttt{2} \\
       \texttt{GNU_PROPERTY_LOPROC} & \texttt{0xb0000000} \\
       \texttt{GNU_PROPERTY_HIPROC} & \texttt{0xdfffffff} \\
       \texttt{GNU_PROPERTY_LOUSER} & \texttt{0xe0000000} \\
@@ -424,6 +425,19 @@ The following program property types are defined:
    input relocatable objects and copy this property to the output.
    Run-time loader should raise the stack limit to the value specified
    in this property.
+ \item[GNU_PROPERTY_NO_COPY_ON_PROTECTED]
+   \begin{sloppypar}
+   This indicates that there should be no copy relocations against
+   protected data symbols.  If a relocatable object contains this
+   property, linker should treat protected data symbol as defined
+   locally at run-time and copy this property to the output share
+   object.  Linker should add this property to the output share
+   object if any protected symbol is expected to be defined locally
+   at run-time.  Run-time loader should disallow copy relocations
+   against protected data symbols defined in share objects with
+   \code{GNU_PROPERTY_NO_COPY_ON_PROTECTED} property.  Its
+   \code{PR_DATASZ} should be 0.
+   \end{sloppypar}
  \item[GNU_PROPERTY_LOPROC through GNU_PROPERTY_HIPROC]
    Values in this inclusive range are reserved for processor-specific
    semantics.

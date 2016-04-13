@@ -47,6 +47,7 @@ is reserved for LLVM.
       \texttt{.eh_frame_hdr} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
       \texttt{.note.ABI-tag} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.note.gnu.build-id} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
+      \texttt{.note.gnu.property} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.sdata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.sbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.lrodata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
@@ -69,6 +70,9 @@ is reserved for LLVM.
    described in Section~\ref{sec_abi_tag} of this document.
  \item[.note.gnu.build-id] This section holds a build ID note.  The
    contents are described in Section~\ref{sec_build_id} of this document.
+ \item[.note.gnu.property] This section holds a program property note.
+   The contents are described in Section~\ref{sec_property} of this
+   document.
  \item[.sdata] This section holds small initialized data that
    contribute to the program's memory image.
  \item[.sbss] This section holds small uninitialized data that
@@ -346,6 +350,130 @@ merged with other \code{SHT_NOTE} sections.
    string.  It should be \code{GNU}.
  \item[n_desc] The note descriptor.  The first \code{n_descsz} bytes in
    \code{n_desc} is the build ID.
+\end{description}
+
+\subsection{\code{.note.gnu.property} section}
+\label{sec_property}
+
+\code{.note.gnu.property} section contains a program property note which
+describes special handling requirements for linker and run-time loader.
+It can be merged with other \code{SHT_NOTE} sections.
+
+\begin{table}[H]
+\Hrule
+ \caption{The Program Property Note Format}
+ \label{format-property}
+ \begin{center}
+  \begin{tabular}[t]{l|l|l}
+   \multicolumn{1}{c}{Field}
+     & \multicolumn{1}{c}{Length}
+       & \multicolumn{1}{c}{Contents} \\
+   \hline
+   \texttt{n_namsz} & \texttt{4} & \texttt{4} \\
+   \texttt{n_descsz} & \texttt{4} & The note descriptor size \\
+   \texttt{n_type} & \texttt{4} & \texttt{NT_GNU_PROPERTY_TYPE_0} \\
+   \texttt{n_name} & \texttt{4} & \texttt{GNU} \\
+   \texttt{n_desc} & \texttt{n_descsz} & The program property array \\
+  \end{tabular}
+ \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[n_namsz] Size of the \code{n_name} field.  A 4-byte integer in the
+   format of the target processor.  It should be 4.
+ \item[n_descsz] Size of the \code{n_desc} field.  A 4-byte integer in the
+   format of the target processor.
+ \item[n_type] Type of the note descriptor.  A 4-byte integer in the format
+   of the target processor.  It should be \code{NT_GNU_PROPERTY_TYPE_0}.
+ \item[n_name] Owner of the build ID note.  A null-terminated character
+   string.  It should be \code{GNU}.
+ \item[n_desc] The note descriptor.  The first \code{n_descsz} bytes in
+   \code{n_desc} is the program property array.
+\end{description}
+
+\subsubsection{The program property array}
+
+Each array element represents one program property with type, data size
+and data.  In 64-bit objects, each element is an array of 8-byte integers
+in the format of the target processor.  In 32-bit objects, each element
+is an array of 4-byte integers in the format of the target processor.
+An array element has the following structure:
+
+\begin{verbatim}
+typedef struct {
+  Elf_Word pr_type;
+  Elf_Word pr_datasz;
+  unsigned char pr_data[PR_DATASZ];
+  unsigned char pr_padding[PR_PADDING];
+} Elf_Prop;
+\end{verbatim}
+
+\begin{description}
+ \item[pr_type] The type of program property.  A 4-byte integer in the
+   format of the target processor.
+ \item[pr_datasz] The size of the \code{pr_data} field.  A 4-byte
+   integer in the format of the target processor.
+ \item[pr_data] The program property descriptor.  An array of 4-byte
+   integers in 32-bit object or 8-byte integers in 64-bit objects, in
+   the format of the target processor.
+ \item[pr_padding] The padding.  If necessary, it aligns the array
+   element to 8 or 4-byte alignment (depending on whether the file is
+   a 64-bit or 32-bit object).
+ \item[PR_DATASZ] The value in the \code{pr_datasz} field.  A constant.
+ \item[PR_PADDING] The size of the \code{pr_padding} field.  A constant.
+\end{description}
+
+The array elements are sorted by the program property type.
+
+\subsubsection{Types of program properties}
+
+The following program property types are defined:
+
+\begin{table}[H]
+\Hrule
+  \caption{Program Property Types}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
+      \hline
+      \texttt{GNU_PROPERTY_STACK_SIZE} & \texttt{1} \\
+      \texttt{GNU_PROPERTY_NO_COPY_ON_PROTECTED} & \texttt{2} \\
+      \texttt{GNU_PROPERTY_LOPROC} & \texttt{0xc0000000} \\
+      \texttt{GNU_PROPERTY_HIPROC} & \texttt{0xdfffffff} \\
+      \texttt{GNU_PROPERTY_LOUSER} & \texttt{0xe0000000} \\
+      \texttt{GNU_PROPERTY_HIUSER} & \texttt{0xffffffff} \\
+    \end{tabular}
+  \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+ \item[GNU_PROPERTY_STACK_SIZE]
+   Its \code{pr_data} field contains an integer in the format of the
+   target processor.  Linker should select the maximum value among all
+   input relocatable objects and copy this property to the output.
+   Run-time loader should raise the stack limit to the value specified
+   in this property.
+ \item[GNU_PROPERTY_NO_COPY_ON_PROTECTED]
+   \begin{sloppypar}
+   This indicates that there should be no copy relocations against
+   protected data symbols.  If a relocatable object contains this
+   property, linker should treat protected data symbol as defined
+   locally at run-time and copy this property to the output share
+   object.  Linker should add this property to the output share
+   object if any protected symbol is expected to be defined locally
+   at run-time.  Run-time loader should disallow copy relocations
+   against protected data symbols defined in share objects with
+   \code{GNU_PROPERTY_NO_COPY_ON_PROTECTED} property.  Its
+   \code{PR_DATASZ} should be 0.
+   \end{sloppypar}
+ \item[GNU_PROPERTY_LOPROC through GNU_PROPERTY_HIPROC]
+   Values in this inclusive range are reserved for processor-specific
+   semantics.
+ \item[GNU_PROPERTY_LOUSER through GNU_PROPERTY_HIUSER]
+   Values in this inclusive range are reserved for application-specific
+   semantics.
 \end{description}
 
 \subsection{\code{.note.ABI-tag} section}

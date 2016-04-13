@@ -407,6 +407,7 @@ The following program property types are defined:
     \begin{tabular}[t]{l|l}
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
       \hline
+      \texttt{GNU_PROPERTY_STACK_SIZE} & \texttt{1} \\
       \texttt{GNU_PROPERTY_LOPROC} & \texttt{0xb0000000} \\
       \texttt{GNU_PROPERTY_HIPROC} & \texttt{0xdfffffff} \\
       \texttt{GNU_PROPERTY_LOUSER} & \texttt{0xe0000000} \\
@@ -417,6 +418,12 @@ The following program property types are defined:
 \end{table}
 
 \begin{description}
+ \item[GNU_PROPERTY_STACK_SIZE]
+   Its \code{pr_data} field contains an integer in the format of the
+   target processor.  Linker should select the maximum value among all
+   input relocatable objects and copy this property to the output.
+   Run-time loader should raise the stack limit to the value specified
+   in this property.
  \item[GNU_PROPERTY_LOPROC through GNU_PROPERTY_HIPROC]
    Values in this inclusive range are reserved for processor-specific
    semantics.

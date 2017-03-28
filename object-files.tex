@@ -17,7 +17,7 @@
       \texttt{.eh_frame_hdr} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
       \texttt{.note.ABI-tag} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.note.gnu.build-id} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
-      \texttt{.note.gnu.property.0} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
+      \texttt{.note.gnu.property} & \texttt{SHT_NOTE} & \texttt{SHF_ALLOC} \\
       \texttt{.sdata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.sbss} & \texttt{SHT_NOBITS} & \texttt{SHF_ALLOC+SHF_WRITE} \\
       \texttt{.lrodata} & \texttt{SHT_PROGBITS} & \texttt{SHF_ALLOC} \\
@@ -40,7 +40,7 @@
    described in Section~\ref{sec_abi_tag} of this document.
  \item[.note.gnu.build-id] This section holds a build ID note.  The
    contents are described in Section~\ref{sec_build_id} of this document.
- \item[.note.gnu.property.0] This section holds a program property note.
+ \item[.note.gnu.property] This section holds a program property note.
    The contents are described in Section~\ref{sec_property} of this
    document.
  \item[.sdata] This section holds small initialized data that
@@ -322,10 +322,10 @@ merged with other \code{SHT_NOTE} sections.
    \code{n_desc} is the build ID.
 \end{description}
 
-\subsection{\code{.note.gnu.property.0} section}
+\subsection{\code{.note.gnu.property} section}
 \label{sec_property}
 
-\code{.note.gnu.property.0} section contains a program property note which
+\code{.note.gnu.property} section contains a program property note which
 describes special handling requirements for linker and run-time loader.
 It can be merged with other \code{SHT_NOTE} sections.
 

@@ -409,7 +409,6 @@ The following program property types are defined:
       \hline
       \texttt{GNU_PROPERTY_STACK_SIZE} & \texttt{1} \\
       \texttt{GNU_PROPERTY_NO_COPY_ON_PROTECTED} & \texttt{2} \\
-      \texttt{GNU_PROPERTY_GCC_LTO_OPTIONS} & \texttt{3} \\
       \texttt{GNU_PROPERTY_LOPROC} & \texttt{0xb0000000} \\
       \texttt{GNU_PROPERTY_HIPROC} & \texttt{0xdfffffff} \\
       \texttt{GNU_PROPERTY_LOUSER} & \texttt{0xe0000000} \\
@@ -439,15 +438,6 @@ The following program property types are defined:
    \code{GNU_PROPERTY_NO_COPY_ON_PROTECTED} property.  Its
    \code{PR_DATASZ} should be 0.
    \end{sloppypar}
- \item[GNU_PROPERTY_GCC_LTO_OPTIONS]
-   Its \code{pr_data} field contains a string which are command-line
-   options for GCC. This property is valid only in LTO IR objects.
-   For the output LTO IR object, linker should merge the
-   \code{GNU_PROPERTY_GCC_LTO_OPTIONS} property from all input
-   LTO IR objects and copy it to the output.  When generating non-IR
-   output, linker should merge the \code{GNU_PROPERTY_GCC_LTO_OPTIONS}
-   property from all input LTO IR objects and pass them to GCC as
-   additional command-line options.
  \item[GNU_PROPERTY_LOPROC through GNU_PROPERTY_HIPROC]
    Values in this inclusive range are reserved for processor-specific
    semantics.

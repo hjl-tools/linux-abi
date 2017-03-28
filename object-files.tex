@@ -341,7 +341,7 @@ It can be merged with other \code{SHT_NOTE} sections.
    \hline
    \texttt{n_namsz} & \texttt{4} & \texttt{4} \\
    \texttt{n_descsz} & \texttt{4} & The note descriptor size \\
-   \texttt{n_type} & \texttt{4} & \texttt{NT_GNU_PROPERTY_0} \\
+   \texttt{n_type} & \texttt{4} & \texttt{NT_GNU_PROPERTY_TYPE_0} \\
    \texttt{n_name} & \texttt{4} & \texttt{GNU} \\
    \texttt{n_desc} & \texttt{n_descsz} & The program property array \\
   \end{tabular}
@@ -355,7 +355,7 @@ It can be merged with other \code{SHT_NOTE} sections.
  \item[n_descsz] Size of the \code{n_desc} field.  A 4-byte integer in the
    format of the target processor.
  \item[n_type] Type of the note descriptor.  A 4-byte integer in the format
-   of the target processor.  It should be \code{NT_GNU_PROPERTY_0}.
+   of the target processor.  It should be \code{NT_GNU_PROPERTY_TYPE_0}.
  \item[n_name] Owner of the build ID note.  A null-terminated character
    string.  It should be \code{GNU}.
  \item[n_desc] The note descriptor.  The first \code{n_descsz} bytes in

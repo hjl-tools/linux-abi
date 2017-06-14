@@ -3,6 +3,36 @@
 
 \section{Sections}
 
+The following section types are defined.
+
+\begin{table}[H]
+\Hrule
+  \caption{Section types}
+  \begin{center}
+    \begin{tabular}[t]{l|l}
+      \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
+      \hline
+      \texttt{SHT_GNU_INCREMENTAL_INPUTS} & \texttt{0x6fff4700} \\
+      \texttt{SHT_LLVM_ODRTAB} & \texttt{0x6fff4c00} \\
+      \texttt{SHT_GNU_ATTRIBUTES} & \texttt{0x6ffffff5} \\
+      \texttt{SHT_GNU_HASH} & \texttt{0x6ffffff6} \\
+      \texttt{SHT_GNU_LIBLIST} & \texttt{0x6ffffff7} \\
+  \end{tabular}
+ \end{center}
+\Hrule
+\end{table}
+
+\begin{description}
+  \item[SHT_GNU_INCREMENTAL_INPUTS] Incremental build data.
+  \item[SHT_LLVM_ODRTAB] LLVM ODR table.
+  \item[SHT_GNU_ATTRIBUTES] Object attributes.
+  \item[SHT_GNU_HASH] GNU style symbol hash table.
+  \item[SHT_GNU_LIBLIST] List of prelink dependencies.
+\end{description}
+
+The section type range \texttt{0x6fff4c00} to \texttt{0x6fff4cff}
+is reserved for LLVM.
+
 \subsection{Special Sections}
 
 \begin{table}[H]

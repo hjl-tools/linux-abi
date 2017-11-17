@@ -518,6 +518,18 @@ identify OS and version targeted.  It can be merged with other
    signifies a 2.2.5 kernel.
 \end{description}
 
+\subsection{Alignment of Note Sections}
+
+All entries in a \texttt{PT_NOTE} segment have the same alignment which
+equals to the {\tt p_align} field in program header.
+
+According to gABI, each note entry should be aligned to 4 bytes in
+32-bit objects or 8 bytes in 64-bit objects.  But \code{.note.ABI-tag}
+section (see Section~\ref{sec_abi_tag}) and \code{.note.gnu.build-id}
+section (see Section~\ref{sec_build_id}) are aligned to 4 bytes in
+both 32-bit and 64-bit objects.  Note parser should use {\tt p_align}
+for note alignment, instead of assuming alignment based on ELF file class.
+
 \section{Symbol Table}
 
 \begin{table}[H]

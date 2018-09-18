@@ -414,9 +414,8 @@ typedef struct {
    format of the target processor.
  \item[pr_datasz] The size of the \code{pr_data} field.  A 4-byte
    integer in the format of the target processor.
- \item[pr_data] The program property descriptor.  An array of 4-byte
-   integers in 32-bit object or 8-byte integers in 64-bit objects, in
-   the format of the target processor.
+ \item[pr_data] The program property descriptor which is aligned to 4
+   bytes in 32-bit objects and 8 bytes in 64-bit objects.
  \item[pr_padding] The padding.  If necessary, it aligns the array
    element to 8 or 4-byte alignment (depending on whether the file is
    a 64-bit or 32-bit object).
@@ -450,8 +449,9 @@ The following program property types are defined:
 
 \begin{description}
  \item[GNU_PROPERTY_STACK_SIZE]
-   Its \code{pr_data} field contains an integer in the format of the
-   target processor.  Linker should select the maximum value among all
+   Its \code{pr_data} field contains a 4-byte integer in 32-bit objects
+   and 8-byte integer in 64-bit objects, in the format of the target
+   processor.  Linker should select the maximum value among all
    input relocatable objects and copy this property to the output.
    Run-time loader should raise the stack limit to the value specified
    in this property.

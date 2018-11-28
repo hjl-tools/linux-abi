@@ -13,6 +13,7 @@ The following \xOS program header types are defined:
       \multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Value} \\
       \hline
       \texttt{PT_GNU_EH_FRAME} & \texttt{0x6474e550} \\
+      \texttt{PT_GNU_PROPERTY} & \texttt{0x6474e553} \\
     \end{tabular}
   \end{center}
 \Hrule
@@ -22,6 +23,9 @@ The following \xOS program header types are defined:
  \item[PT_GNU_EH_FRAME]
       The segment contains \texttt{.eh_frame_hdr} section.  See
       Section~\ref{sec_eh_frame_hdr} of this document.
+ \item[PT_GNU_PROPERTY]
+      The segment contains \texttt{.note.gnu.property} section.  See
+      Section~\ref{sec_property} of this document.
 \end{description}
 
 \section{Note Section}

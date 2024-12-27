@@ -469,6 +469,17 @@ The following program property types are defined:
    \code{GNU_PROPERTY_NO_COPY_ON_PROTECTED} property.  Its
    \code{PR_DATASZ} should be 0.
    \end{sloppypar}
+ \item[GNU_PROPERTY_MEMORY_SEAL]
+   \begin{sloppypar}
+   This indicates that dynamic linker should memory seal all loaded
+   segments after relocation and additional security hardening processing
+   (such as \texttt{PT_GNU_RELRO}). The memory sealing avoids further
+   mapping changes (such as unmapping or change permission flags) and
+   it relies on underlying kernel support through the \texttt{mseal}
+   syscall. The loader can also enforce or just take the property as
+   hint.  Its
+   \code{PR_DATASZ} should be 0.
+   \end{sloppypar}
  \item[GNU_PROPERTY_LOPROC through GNU_PROPERTY_HIPROC]
    Values in this inclusive range are reserved for processor-specific
    semantics.
